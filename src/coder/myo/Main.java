@@ -5,6 +5,9 @@ import java.util.Scanner;
 
 public class Main {
 
+    private static byte MONTHS_IN_YEARS = 12;
+    private static byte PERCENT = 100;
+
     public static void main(String[] args) {
         int principal = (int)readNumber("Principal ($1K - 1M):  ", 1000, 1000000);
         float annualInterset = (float)readNumber("Annual Interest Rate: ", 1, 30);
@@ -13,7 +16,18 @@ public class Main {
         double mortgage = calculateMortgage(principal, annualInterset, years);
 
         String mortgageFomatted = NumberFormat.getCurrencyInstance().format(mortgage);
-        System.out.println("Mortgage :"+ mortgageFomatted);
+        System.out.println("Mortgage :");
+        System.out.println("---------");
+        System.out.println("Monthly Payments "+ mortgageFomatted);
+
+        System.out.println();
+        System.out.println("Payment schedule");
+        System.out.println("----------------");
+
+        for(short i = 1; i <= years * MONTHS_IN_YEARS; i++){
+            double balacne = calculateBalance(principal, annualInterset, years, i);
+            System.out.println(NumberFormat.getCurrencyInstance().format(balacne));
+        }
     }
 
     private static double readNumber(String prompt, double min, double max){
@@ -30,9 +44,16 @@ public class Main {
         return value;
     }
 
+    private static double calculateBalance(int principal, float annualInterest, byte years, short numberOfPaymentsMade) {
+        short numberOfPayments = (short)(years * MONTHS_IN_YEARS);
+        float monthlyInterset = annualInterest / PERCENT / MONTHS_IN_YEARS;
+
+        return principal * (Math.pow(1 + monthlyInterset, numberOfPayments) - Math.pow(1 + monthlyInterset, numberOfPaymentsMade))
+                / (Math.pow(1 + monthlyInterset, numberOfPayments) - 1);
+    }
+
     private static double calculateMortgage(int principal, float annualInterset, byte years){
-        byte MONTHS_IN_YEARS = 12;
-        byte PERCENT = 100;
+
         short numberOfPayments = (short)(years * MONTHS_IN_YEARS);
         float monthlyInterset = annualInterset / PERCENT / MONTHS_IN_YEARS;
 
@@ -40,4 +61,5 @@ public class Main {
         return principal * (monthlyInterset * Math.pow(1 + monthlyInterset, numberOfPayments))
                 / (Math.pow(1 + monthlyInterset, numberOfPayments) - 1);
     }
+
 }
